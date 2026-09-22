@@ -19,7 +19,10 @@ if (-not $token) {
 }
 
 $env:GH_TOKEN = $token
-$token | & $gh auth login --hostname github.com --git-protocol https --with-token 2>$null
+$status = & $gh auth status 2>&1 | Out-String
+if ($status -notmatch 'Logged in') {
+    $token | & $gh auth login --hostname github.com --git-protocol https --with-token 2>$null
+}
 
 & $gh auth status
 if ($LASTEXITCODE -ne 0) { exit 1 }
