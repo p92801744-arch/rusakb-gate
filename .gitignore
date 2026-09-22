@@ -13,6 +13,9 @@ bin/Release/
 
 # Secrets & delivery
 profile.json
+token_git.txt
+github.token
+**/github.token
 **/secrets.env
 *.zip
 gate.log
