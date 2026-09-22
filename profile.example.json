@@ -1,0 +1,14 @@
+# Скопируй в %LOCALAPPDATA%\RusakbGate\profile.json и подставь свои значения с VPS (deploy_new_ip.ps1)
+{
+  "appName": "RusakbGate",
+  "serverHost": "YOUR_PRIMARY_IP",
+  "serverHostBackup": "YOUR_BACKUP_IP",
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "publicKey": "REALITY_PUBLIC_FROM_SERVER",
+  "shortId": "8hexchars",
+  "sni": "www.apple.com",
+  "socksPort": 10818,
+  "httpPort": 10819,
+  "xhttpPrimary": 443,
+  "xhttpBackup": 2053
+}

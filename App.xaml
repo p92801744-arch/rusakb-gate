@@ -1,0 +1,19 @@
+<Application x:Class="RusakbGate.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush x:Key="Bg0" Color="#0f1117"/>
+        <SolidColorBrush x:Key="Bg1" Color="#171b26"/>
+        <SolidColorBrush x:Key="Bg2" Color="#222838"/>
+        <SolidColorBrush x:Key="Fg" Color="#eef1f8"/>
+        <SolidColorBrush x:Key="Muted" Color="#9aa3b8"/>
+        <SolidColorBrush x:Key="Accent" Color="#5b8cff"/>
+        <SolidColorBrush x:Key="Accent2" Color="#3d6ef0"/>
+        <SolidColorBrush x:Key="Ok" Color="#22c55e"/>
+        <SolidColorBrush x:Key="OkDark" Color="#15803d"/>
+        <SolidColorBrush x:Key="Off" Color="#3a4154"/>
+        <SolidColorBrush x:Key="Warn" Color="#f59e0b"/>
+        <SolidColorBrush x:Key="Err" Color="#ef4444"/>
+    </Application.Resources>
+</Application>

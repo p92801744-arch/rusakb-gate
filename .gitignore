@@ -1,0 +1,22 @@
+# Build / publish
+bin/xray.exe
+bin/sing-box.exe
+bin/wintun.dll
+bin/geoip.dat
+bin/geosite.dat
+publish/
+publish_new/
+obj/
+bin/Release/
+*.user
+*.suo
+
+# Secrets & delivery
+profile.json
+**/secrets.env
+*.zip
+gate.log
+
+# OS
+Thumbs.db
+Desktop.ini
