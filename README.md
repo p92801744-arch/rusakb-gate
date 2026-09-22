@@ -48,27 +48,19 @@ cd server
 
 ## GitHub — первый push
 
-```powershell
-cd D:\Projects\РУСАКБ\clients\rusakb-gate
-git init
-git add .
-git commit -m "Initial RusakbGate client and server scripts"
-```
-
-На [github.com/new](https://github.com/new) создай **приватный** репозиторий `rusakb-gate` (без README).
+См. **`docs/github-agent-push.md`** — как сохранить токен, чтобы агент мог пушить сам.
 
 ```powershell
-git branch -M main
-git remote add origin https://github.com/ТВОЙ_ЛОГИН/rusakb-gate.git
-git push -u origin main
+.\setup_github_token.ps1   # один раз
+.\push_github.ps1
 ```
 
 Дальнейшие обновления:
 
 ```powershell
 git add .
-git commit -m "описание изменения"
-git push
+git commit -m "описание"
+.\push_github.ps1
 ```
 
 После обновления кода на машине с SDK снова `.\pack_setup.ps1` и раздай новый ZIP.
