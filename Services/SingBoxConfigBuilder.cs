@@ -15,10 +15,14 @@ public static class SingBoxConfigBuilder
         foreach (var h in p.AllServerHosts())
             exclude.Add($"{h}/32");
 
-        var directRules = p.AllServerHosts()
-            .Select(h => new { ip_cidr = new[] { $"{h}/32" }, outbound = "direct" })
-            .Cast<object>()
-            .ToArray();
+        // sniff нужен, иначе TUN видит только IP и правила по доменам не срабатывают.
+        var directRules = new List<object>
+        {
+            new Dictionary<string, object?> { ["action"] = "sniff" }
+        };
+        foreach (var h in p.AllServerHosts())
+            directRules.Add(new { ip_cidr = new[] { $"{h}/32" }, outbound = "direct" });
+        directRules.Add(new { domain_suffix = RuDirect.Suffixes, outbound = "direct" });
 
         var obj = new Dictionary<string, object?>
         {
@@ -35,6 +39,14 @@ public static class SingBoxConfigBuilder
                         ["detour"] = "proxy"
                     },
                     new Dictionary<string, object?> { ["type"] = "local", ["tag"] = "dns-local" }
+                },
+                ["rules"] = new object[]
+                {
+                    new Dictionary<string, object?>
+                    {
+                        ["domain_suffix"] = RuDirect.Suffixes,
+                        ["server"] = "dns-local"
+                    }
                 },
                 ["final"] = "dns-remote",
                 ["strategy"] = "ipv4_only"
@@ -63,12 +75,17 @@ public static class SingBoxConfigBuilder
                     ["server"] = "127.0.0.1",
                     ["server_port"] = p.SocksPort
                 },
-                new Dictionary<string, object?> { ["type"] = "direct", ["tag"] = "direct" }
+                new Dictionary<string, object?>
+                {
+                    ["type"] = "direct",
+                    ["tag"] = "direct"
+                }
             },
             ["route"] = new Dictionary<string, object?>
             {
-                ["rules"] = directRules,
+                ["rules"] = directRules.ToArray(),
                 ["final"] = "proxy",
+                ["auto_detect_interface"] = true,
                 ["default_domain_resolver"] = new Dictionary<string, object?> { ["server"] = "dns-local" }
             }
         };

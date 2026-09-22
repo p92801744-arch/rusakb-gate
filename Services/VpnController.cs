@@ -11,6 +11,9 @@ public sealed class VpnController
     private Process? _singbox;
     private readonly List<string> _bypassHosts = new();
 
+    /// <summary>Ядро VPN само завершилось — UI должен снять «подключено».</summary>
+    public event Action<string>? CoreDied;
+
     public bool IsRunning =>
         _xray is { HasExited: false } && _singbox is { HasExited: false };
 
@@ -60,6 +63,32 @@ public sealed class VpnController
 
         if (!await TunUpAsync())
             throw Fail("TUN не поднялся (10.0.85.1). Проверь wintun.dll и права администратора.", work);
+
+        _ = WatchProcessesAsync();
+    }
+
+    private async Task WatchProcessesAsync()
+    {
+        while (_xray is not null || _singbox is not null)
+        {
+            await Task.Delay(2000);
+            if (_xray is { HasExited: true })
+            {
+                var msg = "xray завершился, код " + _xray.ExitCode;
+                ProfileStore.AppendLog("[watch] " + msg);
+                await StopAsync();
+                CoreDied?.Invoke(msg);
+                return;
+            }
+            if (_singbox is { HasExited: true })
+            {
+                var msg = "sing-box завершился, код " + _singbox.ExitCode;
+                ProfileStore.AppendLog("[watch] " + msg);
+                await StopAsync();
+                CoreDied?.Invoke(msg);
+                return;
+            }
+        }
     }
 
     public Task StopAsync()
@@ -125,6 +154,7 @@ public sealed class VpnController
             RedirectStandardOutput = true
         };
         var p = Process.Start(psi) ?? throw new InvalidOperationException("Не удалось запустить " + exe);
+        try { ChildProcessJob.Add(p); } catch { /* job optional on older Windows */ }
         void Log(string? line)
         {
             if (string.IsNullOrWhiteSpace(line)) return;

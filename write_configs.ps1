@@ -13,7 +13,19 @@ $exclude = @(
     "127.0.0.0/8", "169.254.0.0/16", "224.0.0.0/4"
 ) + ($hosts | ForEach-Object { "$_/32" })
 
-$directRules = $hosts | ForEach-Object { @{ ip_cidr = @("$_/32"); outbound = "direct" } }
+$ruSuffixes = @(
+    ".ru", ".su", ".xn--p1ai",
+    "bitrix24.com", "bitrix.info", "bitrixsoft.com", "bitrix24.net", "1cfresh.com",
+    "vk.com", "vk.me", "vk.cc", "userapi.com", "vkuser.net", "vkuseraudio.net", "vkuseraudio.com", "mvk.com",
+    "my.com",
+    "yandex.com", "yandex.net", "yandexcloud.net", "yastatic.net",
+    "ozon.com", "ozonusercontent.com", "wbstatic.net",
+    "sberbank.com", "tinkoff.com", "tbank.ru", "alfabank.com", "avito.st", "2gis.com"
+)
+
+$directRules = @(@{ action = "sniff" })
+$directRules += @($hosts | ForEach-Object { @{ ip_cidr = @("$_/32"); outbound = "direct" } })
+$directRules += @{ domain_suffix = $ruSuffixes; outbound = "direct" }
 
 $sb = @{
     log = @{ level = "info"; timestamp = $true }
@@ -21,6 +33,9 @@ $sb = @{
         servers = @(
             @{ type = "udp"; tag = "dns-remote"; server = "1.1.1.1"; detour = "proxy" },
             @{ type = "local"; tag = "dns-local" }
+        )
+        rules = @(
+            @{ domain_suffix = $ruSuffixes; server = "dns-local" }
         )
         final = "dns-remote"
         strategy = "ipv4_only"
@@ -45,6 +60,7 @@ $sb = @{
     route = @{
         rules = $directRules
         final = "proxy"
+        auto_detect_interface = $true
         default_domain_resolver = @{ server = "dns-local" }
     }
 }

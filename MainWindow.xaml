@@ -4,6 +4,7 @@
         Title="RusakbGate" Height="480" Width="440"
         Background="{StaticResource Bg0}" Foreground="{StaticResource Fg}"
         WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize"
+        ShowInTaskbar="True" Topmost="False"
         FontFamily="Segoe UI">
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -70,7 +71,7 @@
             <StackPanel>
                 <TextBlock x:Name="StatusText" TextWrapping="Wrap" TextAlignment="Center"
                            Foreground="{StaticResource Fg}" FontSize="13" LineHeight="20"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+                <StackPanel x:Name="MainActions" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
                     <Button Content="Проверка IP" Click="CheckIp_Click" Padding="18,10" Margin="0,0,8,0"
                             Background="{StaticResource Accent}" Foreground="White" BorderThickness="0"
                             Cursor="Hand">
@@ -84,6 +85,10 @@
                             Background="{StaticResource Bg2}" Foreground="{StaticResource Fg}"
                             BorderBrush="#3a4154" BorderThickness="1" Cursor="Hand"/>
                 </StackPanel>
+                <Button x:Name="BackButton" Content="Назад" Click="Back_Click" Visibility="Collapsed"
+                        HorizontalAlignment="Center" Margin="0,14,0,0" Padding="28,10"
+                        Background="{StaticResource Bg2}" Foreground="{StaticResource Fg}"
+                        BorderBrush="#3a4154" BorderThickness="1" Cursor="Hand"/>
             </StackPanel>
         </Border>
     </Grid>

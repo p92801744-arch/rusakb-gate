@@ -21,8 +21,15 @@ public static class ProfileStore
         File.WriteAllText(LogPath, "");
     }
 
-    public static void AppendLog(string line) =>
-        File.AppendAllText(LogPath, line + Environment.NewLine);
+    public static void AppendLog(string line)
+    {
+        try
+        {
+            Directory.CreateDirectory(AppDir);
+            File.AppendAllText(LogPath, line + Environment.NewLine);
+        }
+        catch { /* log must not crash the app */ }
+    }
 
     public static string ReadLogTail(int lines = 10)
     {
