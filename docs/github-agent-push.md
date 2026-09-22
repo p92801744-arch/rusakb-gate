@@ -7,8 +7,8 @@ GitHub не пускает «просто так» — нужен **Personal Acc
 
 1. [github.com/settings/tokens](https://github.com/settings/tokens) → **Generate new token** (classic или fine-grained).
 2. Права минимум:
-   - **classic:** `repo` (для приватного `rusakb-gate`)
-   - **fine-grained:** репозиторий `rusakb-gate`, Contents read/write, Metadata read
+   - **classic:** галочка **`repo`** целиком (нужна и **создание** репозитория через `gh repo create`)
+   - **fine-grained:** если репо ещё нет — **сначала создай** пустой Private `rusakb-gate` на GitHub вручную; токену дай Contents read/write на этот репозиторий (создание через API у fine-grained часто недоступно)
 3. Скопируй токен (показывается один раз).
 
 ## 2. Сохрани токен локально (выбери один способ)
