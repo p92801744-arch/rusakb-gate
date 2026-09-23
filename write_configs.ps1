@@ -15,7 +15,8 @@ $exclude = @(
 
 $ruSuffixes = @(
     ".ru", ".su", ".xn--p1ai",
-    "bitrix24.com", "bitrix.info", "bitrixsoft.com", "bitrix24.net", "1cfresh.com",
+    "bitrix24.com", "bitrix24.eu", "bitrix24.de", "bitrix24.fr", "bitrix24.pl", "bitrix24.es", "bitrix24.in", "bitrix24.com.br", "bitrix24.site",
+    "bitrix.info", "bitrixsoft.com", "bitrix24.net", "1cfresh.com",
     "vk.com", "vk.me", "vk.cc", "userapi.com", "vkuser.net", "vkuseraudio.net", "vkuseraudio.com", "mvk.com",
     "my.com",
     "yandex.com", "yandex.net", "yandexcloud.net", "yastatic.net",
@@ -23,7 +24,12 @@ $ruSuffixes = @(
     "sberbank.com", "tinkoff.com", "tbank.ru", "alfabank.com", "avito.st", "2gis.com"
 )
 
-$directRules = @(@{ action = "sniff" })
+$directRules = @(
+    @{ action = "sniff" },
+    @{ protocol = "dns"; action = "hijack-dns" },
+    @{ network = "udp"; port = 443; action = "reject" },
+    @{ process_name = @("chrome.exe", "browser.exe", "Bitrix24.exe"); outbound = "direct" }
+)
 $directRules += @($hosts | ForEach-Object { @{ ip_cidr = @("$_/32"); outbound = "direct" } })
 $directRules += @{ domain_suffix = $ruSuffixes; outbound = "direct" }
 
@@ -31,11 +37,10 @@ $sb = @{
     log = @{ level = "info"; timestamp = $true }
     dns = @{
         servers = @(
-            @{ type = "udp"; tag = "dns-remote"; server = "1.1.1.1"; detour = "proxy" },
-            @{ type = "local"; tag = "dns-local" }
+            @{ type = "udp"; tag = "dns-remote"; server = "1.1.1.1"; detour = "proxy" }
         )
         rules = @(
-            @{ domain_suffix = $ruSuffixes; server = "dns-local" }
+            @{ domain_suffix = $ruSuffixes; server = "dns-remote" }
         )
         final = "dns-remote"
         strategy = "ipv4_only"
@@ -55,13 +60,13 @@ $sb = @{
     )
     outbounds = @(
         @{ type = "socks"; tag = "proxy"; server = "127.0.0.1"; server_port = [int]$p.socksPort },
-        @{ type = "direct"; tag = "direct" }
+        @{ type = "direct"; tag = "direct"; connect_timeout = "5s" }
     )
     route = @{
         rules = $directRules
         final = "proxy"
         auto_detect_interface = $true
-        default_domain_resolver = @{ server = "dns-local" }
+        default_domain_resolver = @{ server = "dns-remote" }
     }
 }
 

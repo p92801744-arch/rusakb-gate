@@ -45,6 +45,9 @@ public sealed class VpnController
         ValidateXray(xrayExe, xrayCfg);
         ValidateSingBox(sbExe, sbCfg);
 
+        try
+        {
+
         foreach (var h in profile.AllServerHosts())
         {
             AddServerBypassRoute(h);
@@ -65,6 +68,12 @@ public sealed class VpnController
             throw Fail("TUN не поднялся (10.0.85.1). Проверь wintun.dll и права администратора.", work);
 
         _ = WatchProcessesAsync();
+        }
+        catch
+        {
+            await StopAsync();
+            throw;
+        }
     }
 
     private async Task WatchProcessesAsync()

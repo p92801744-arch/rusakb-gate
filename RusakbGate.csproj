@@ -8,7 +8,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>RusakbGate</AssemblyName>
     <RootNamespace>RusakbGate</RootNamespace>
-    <Version>0.2.4</Version>
+    <Version>0.2.9</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 </Project>

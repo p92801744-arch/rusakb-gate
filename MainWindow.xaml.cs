@@ -15,10 +15,14 @@ public partial class MainWindow : Window
     private readonly VpnController _vpn = new();
     private GateProfile? _profile;
     private bool _busy;
+    private bool _ignoreBypassEvent;
 
     public MainWindow()
     {
         InitializeComponent();
+        _ignoreBypassEvent = true;
+        BypassAppsToggle.IsChecked = UiSettings.BypassApps;
+        _ignoreBypassEvent = false;
         _vpn.CoreDied += OnCoreDied;
         VersionText.Text = "Личный VPN · v" + (Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1.0");
         Loaded += (_, _) =>
@@ -126,7 +130,9 @@ public partial class MainWindow : Window
                 StatusText.Text = "Подключаю… (нужны права администратора)";
                 await _vpn.StartAsync(_profile!);
                 SetPill(true);
-                StatusText.Text = "VPN включён. Локальная сеть и IP сервера — мимо туннеля.";
+                StatusText.Text = UiSettings.BypassApps
+                    ? "VPN включён. Chrome, Яндекс и Bitrix идут напрямую."
+                    : "VPN включён. Локальная сеть и IP сервера — мимо туннеля.";
             }
             else
             {
@@ -147,6 +153,14 @@ public partial class MainWindow : Window
             PowerToggle.IsEnabled = true;
             _busy = false;
         }
+    }
+
+    private async void BypassApps_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_ignoreBypassEvent) return;
+        UiSettings.SaveBypassApps(BypassAppsToggle.IsChecked == true);
+        if (_vpn.IsRunning && _profile is not null)
+            await SetVpnAsync(true);
     }
 
     private async void CheckIp_Click(object sender, RoutedEventArgs e)

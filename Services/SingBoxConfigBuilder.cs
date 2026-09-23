@@ -15,11 +15,21 @@ public static class SingBoxConfigBuilder
         foreach (var h in p.AllServerHosts())
             exclude.Add($"{h}/32");
 
-        // sniff нужен, иначе TUN видит только IP и правила по доменам не срабатывают.
+        // Сначала DNS, потом обход программ. Иначе браузер не находит ни один сайт.
         var directRules = new List<object>
         {
-            new Dictionary<string, object?> { ["action"] = "sniff" }
+            new Dictionary<string, object?> { ["action"] = "sniff" },
+            new Dictionary<string, object?> { ["protocol"] = "dns", ["action"] = "hijack-dns" },
+            new Dictionary<string, object?> { ["network"] = "udp", ["port"] = 443, ["action"] = "reject" }
         };
+        if (UiSettings.BypassApps)
+        {
+            directRules.Add(new Dictionary<string, object?>
+            {
+                ["process_name"] = new[] { "chrome.exe", "browser.exe", "Bitrix24.exe" },
+                ["outbound"] = "direct"
+            });
+        }
         foreach (var h in p.AllServerHosts())
             directRules.Add(new { ip_cidr = new[] { $"{h}/32" }, outbound = "direct" });
         directRules.Add(new { domain_suffix = RuDirect.Suffixes, outbound = "direct" });
@@ -37,15 +47,14 @@ public static class SingBoxConfigBuilder
                         ["tag"] = "dns-remote",
                         ["server"] = "1.1.1.1",
                         ["detour"] = "proxy"
-                    },
-                    new Dictionary<string, object?> { ["type"] = "local", ["tag"] = "dns-local" }
+                    }
                 },
                 ["rules"] = new object[]
                 {
                     new Dictionary<string, object?>
                     {
                         ["domain_suffix"] = RuDirect.Suffixes,
-                        ["server"] = "dns-local"
+                        ["server"] = "dns-remote"
                     }
                 },
                 ["final"] = "dns-remote",
@@ -78,7 +87,8 @@ public static class SingBoxConfigBuilder
                 new Dictionary<string, object?>
                 {
                     ["type"] = "direct",
-                    ["tag"] = "direct"
+                    ["tag"] = "direct",
+                    ["connect_timeout"] = "5s"
                 }
             },
             ["route"] = new Dictionary<string, object?>
@@ -86,7 +96,7 @@ public static class SingBoxConfigBuilder
                 ["rules"] = directRules.ToArray(),
                 ["final"] = "proxy",
                 ["auto_detect_interface"] = true,
-                ["default_domain_resolver"] = new Dictionary<string, object?> { ["server"] = "dns-local" }
+                ["default_domain_resolver"] = new Dictionary<string, object?> { ["server"] = "dns-remote" }
             }
         };
 
